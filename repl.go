@@ -1,26 +1,56 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"strings"
 )
 
 func repl() {
+	url := "https://pokeapi.co/api/v2/location/"
+
+	config := config{
+		Next:     &url,
+		Previous: nil,
+	}
+
+	scanner := bufio.NewScanner(os.Stdin)
+
 	for {
-		var input string
 		fmt.Print("pokedex > ")
-		fmt.Scanln(&input)
 
-		input = strings.ToLower(input)
+		if !scanner.Scan() {
+			break
+		}
 
-		if cmd, exists := commands[input]; exists {
-			err := cmd.callback()
+		input := scanner.Text()
+
+		parts := strings.Split(input, " ")
+
+		if len(parts) > 2 {
+			fmt.Println("Error: Invalid command format. Use '<command> [parameter]'.")
+			continue
+		}
+
+		command := parts[0]
+		var parameter string
+		if len(parts) == 2 {
+			parameter = parts[1]
+		}
+
+		if cmd, exists := commands[command]; exists {
+			err := cmd.callback(&config, parameter)
 			if err != nil {
 				fmt.Printf("Error executing command: %v\n", err)
 			}
 		} else {
+			fmt.Println(command + " " + parameter)
 			fmt.Println("Unknown command. Type 'help' for available commands.")
 		}
+	}
 
+	if err := scanner.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error reading input: %v\n", err)
 	}
 }
