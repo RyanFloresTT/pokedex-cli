@@ -42,6 +42,10 @@ func commandMap(cfg *config, input string) error {
 		return err
 	}
 
+	for _, res := range loc.Results {
+		fmt.Println(res.Name)
+	}
+
 	cfg.Next = loc.Next
 	cfg.Previous = loc.Previous
 
@@ -79,8 +83,12 @@ func commandExplore(cfg *config, location string) error {
 		return err
 	}
 
+	fmt.Println("Exploring " + location + "...")
+
+	fmt.Println("Found Pokemon:")
+
 	for _, res := range loc.PokemonEncounters {
-		fmt.Println(res.Pokemon.Name)
+		fmt.Printf(" - %s\n", res.Pokemon.Name)
 	}
 
 	return nil

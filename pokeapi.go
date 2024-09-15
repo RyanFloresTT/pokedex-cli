@@ -24,13 +24,9 @@ func getPokemonEncounters(location string) (AreaLocation, error) {
 
 	cache := internal.NewCache(5)
 
-	url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%v", 1)
+	url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%s", location)
 
 	requestAPI(url, &area, cache)
-
-	for _, res := range area.PokemonEncounters {
-		fmt.Println(res.Pokemon.Name)
-	}
 
 	return area, nil
 }
@@ -55,8 +51,4 @@ func requestAPI(url string, dataStruct any, cache *internal.Cache) error {
 
 	json.Unmarshal(data, &dataStruct)
 	return nil
-}
-
-func getLocationID(name string) int {
-	locations := getLocations()
 }

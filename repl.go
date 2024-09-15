@@ -8,7 +8,7 @@ import (
 )
 
 func repl() {
-	url := "https://pokeapi.co/api/v2/location/"
+	url := "https://pokeapi.co/api/v2/location-area/"
 
 	config := config{
 		Next:     &url,
