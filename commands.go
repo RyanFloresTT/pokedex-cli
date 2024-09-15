@@ -105,7 +105,8 @@ func commandCatch(cfg *config, pName string) error {
 		return err
 	}
 
-	fmt.Println("Throwing a ball at " + pokemon.Name)
+	fmt.Print("Throwing a ball at " + pokemon.Name)
+
 	if tryCatchPokemon(pokemon.BaseExperience) {
 		fmt.Println(pokemon.Name + " was caught!")
 		Pokedex[pokemon.Name] = pokemon
@@ -117,11 +118,15 @@ func commandCatch(cfg *config, pName string) error {
 }
 
 func tryCatchPokemon(baseExp int) bool {
+	for i := 0; i < 3; i++ {
+		time.Sleep(1 * time.Second)
+		fmt.Print(".")
+	}
+	time.Sleep(500 * time.Millisecond)
+	fmt.Println()
 	randomNum := rand.Intn(101)
 
 	catchChance := calculateCatchChance(baseExp)
-
-	time.Sleep(1 * time.Second)
 
 	return randomNum <= int(catchChance)
 }
@@ -138,4 +143,35 @@ func calculateCatchChance(baseExp int) float64 {
 	}
 
 	return catchChance
+}
+
+func commandInspect(cfg *config, pokemonName string) error {
+	if pokemon, exists := Pokedex[pokemonName]; exists {
+		fmt.Println("Name: " + pokemon.Name)
+		fmt.Printf("Height: %v\n", pokemon.Height)
+		fmt.Printf("Weight: %v\n", pokemon.Weight)
+		fmt.Println("Stats:")
+		for _, stat := range pokemon.Stats {
+			fmt.Printf(" -%s: %v\n", stat.Stat.Name, stat.BaseStat)
+		}
+		fmt.Println("Types:")
+		for _, element := range pokemon.Types {
+			fmt.Printf(" - %s\n", element.Type.Name)
+		}
+		return nil
+	}
+	return errors.New("you have not caught that pokemon")
+}
+
+func commandPokedex(cfg *config, input string) error {
+	if len(Pokedex) == 0 {
+		return errors.New("pokedex is empty")
+	}
+
+	fmt.Println("Your Pokedex:")
+
+	for _, pokemon := range Pokedex {
+		fmt.Printf(" - %s\n", pokemon.Name)
+	}
+	return nil
 }

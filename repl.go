@@ -42,7 +42,7 @@ func repl() {
 		if cmd, exists := commands[command]; exists {
 			err := cmd.callback(&config, parameter)
 			if err != nil {
-				fmt.Printf("Error executing command: %v\n", err)
+				fmt.Printf("%v\n", err)
 			}
 		} else {
 			fmt.Println(command + " " + parameter)
