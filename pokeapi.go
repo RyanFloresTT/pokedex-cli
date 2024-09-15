@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,7 +15,10 @@ func getLocations(url string) (location, error) {
 
 	cache := internal.NewCache(5)
 
-	requestAPI(url, &location, cache)
+	err := requestAPI(url, &location, cache)
+	if err != nil {
+		return location, err
+	}
 
 	return location, nil
 }
@@ -26,9 +30,35 @@ func getPokemonEncounters(location string) (AreaLocation, error) {
 
 	url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%s", location)
 
-	requestAPI(url, &area, cache)
+	err := requestAPI(url, &area, cache)
+	if err != nil {
+		return area, err
+	}
 
 	return area, nil
+}
+
+func GetPokemonInfo(name string) (Pokemon, error) {
+	var pokemon Pokemon
+
+	if name == "" {
+		return pokemon, errors.New("must specify a pokemon to catch")
+	}
+
+	cache := internal.NewCache(5)
+
+	url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s", name)
+
+	err := requestAPI(url, &pokemon, cache)
+	if err != nil {
+		return pokemon, err
+	}
+
+	if pokemon.ID == 0 {
+		return pokemon, errors.New("pokemon name not found")
+	}
+
+	return pokemon, nil
 }
 
 func requestAPI(url string, dataStruct any, cache *internal.Cache) error {
@@ -50,5 +80,6 @@ func requestAPI(url string, dataStruct any, cache *internal.Cache) error {
 	cache.Add(url, data)
 
 	json.Unmarshal(data, &dataStruct)
+
 	return nil
 }

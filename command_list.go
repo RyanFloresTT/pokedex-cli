@@ -9,6 +9,8 @@ type cliCommand struct {
 var commands map[string]cliCommand
 
 func initCommands() {
+	Pokedex = make(map[string]Pokemon)
+
 	commands = map[string]cliCommand{
 		"help": {
 			name:        "help",
@@ -34,6 +36,11 @@ func initCommands() {
 			name:        "explore {area}",
 			description: "Shows Pokemon encounters in the given area.",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch {pokemon}",
+			description: "Attempts to catch the specified Pokemon.",
+			callback:    commandCatch,
 		},
 	}
 }

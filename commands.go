@@ -3,13 +3,17 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
 )
 
 type config struct {
 	Next     *string
 	Previous *string
 }
+
+var Pokedex map[string]Pokemon
 
 func commandExit(cfg *config, input string) error {
 	os.Exit(0)
@@ -92,4 +96,46 @@ func commandExplore(cfg *config, location string) error {
 	}
 
 	return nil
+}
+
+func commandCatch(cfg *config, pName string) error {
+	pokemon, err := GetPokemonInfo(pName)
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Throwing a ball at " + pokemon.Name)
+	if tryCatchPokemon(pokemon.BaseExperience) {
+		fmt.Println(pokemon.Name + " was caught!")
+		Pokedex[pokemon.Name] = pokemon
+		return nil
+	}
+
+	fmt.Println(pokemon.Name + " escaped!")
+	return nil
+}
+
+func tryCatchPokemon(baseExp int) bool {
+	randomNum := rand.Intn(101)
+
+	catchChance := calculateCatchChance(baseExp)
+
+	time.Sleep(1 * time.Second)
+
+	return randomNum <= int(catchChance)
+}
+
+func calculateCatchChance(baseExp int) float64 {
+	baseFactor := 100.0
+	experienceFactor := 20.0
+	minCatchChance := 10.0
+
+	catchChance := (baseFactor / (float64(baseExp)/experienceFactor + 1)) + minCatchChance
+
+	if catchChance > 100 {
+		catchChance = 100
+	}
+
+	return catchChance
 }
